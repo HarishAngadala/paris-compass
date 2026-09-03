@@ -1,0 +1,7 @@
+.env
+build/
+.DS_Store
+.idea/
+.vscode/
+*.class
+*.log
