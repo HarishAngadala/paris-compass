@@ -11,11 +11,12 @@ let selectedLayer = null;
 let clickHandler = () => {};
 let hoverHandler = () => {};
 
-const palette = ['#8e3b46', '#c9684e', '#e4ad5a', '#d6cf79', '#92bf78', '#409a72', '#166f5b'];
+const palette = ['#ef5350', '#dc5f68', '#c46a81', '#aa709e', '#8b76bd', '#707ed7', '#5885ea', '#3b82f6'];
 
 export async function initMap(onCountryClick, onCountryHover) {
   clickHandler = onCountryClick;
   hoverHandler = onCountryHover;
+
   map = L.map('map', {
     center: [20, 0],
     zoom: 2,
@@ -23,12 +24,15 @@ export async function initMap(onCountryClick, onCountryHover) {
     maxZoom: 7,
     zoomControl: false,
     worldCopyJump: true,
+    attributionControl: true,
   });
 
   L.control.zoom({ position: 'bottomright' }).addTo(map);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors',
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
   }).addTo(map);
 
   const data = await loadGeoJson();
@@ -42,7 +46,13 @@ export async function initMap(onCountryClick, onCountryHover) {
       });
     },
   }).addTo(map);
+
+  requestAnimationFrame(() => map.invalidateSize());
   return map;
+}
+
+export function invalidateMap() {
+  map?.invalidateSize({ animate: false });
 }
 
 export function updateScores(entries) {
@@ -54,14 +64,16 @@ export function updateScores(entries) {
 export function focusCountry(iso3) {
   if (!geoLayer) return false;
   let found = false;
+
   geoLayer.eachLayer((layer) => {
     if (countryCode(layer.feature) === iso3) {
       found = true;
       selectLayer(layer);
       const bounds = layer.getBounds?.();
-      if (bounds?.isValid()) map.fitBounds(bounds.pad(0.75), { maxZoom: 5, animate: true });
+      if (bounds?.isValid()) map.fitBounds(bounds.pad(0.72), { maxZoom: 5, animate: true, duration: .55 });
     }
   });
+
   return found;
 }
 
@@ -74,43 +86,49 @@ export function countryCode(feature) {
   const candidates = [
     p.ISO_A3, p.iso_a3, p.ADM0_A3, p.SOV_A3, p['ISO3166-1-Alpha-3'], p.ISO3,
   ];
-  const code = candidates.find((v) => typeof v === 'string' && /^[A-Z]{3}$/.test(v));
+  const code = candidates.find((value) => typeof value === 'string' && /^[A-Z]{3}$/.test(value));
   return code || null;
 }
 
 function countryName(feature) {
   const p = feature?.properties || {};
-  return p.ADMIN || p.name || p.NAME || p['name_long'] || 'Country';
+  return p.ADMIN || p.admin || p.name || p.NAME || p.name_long || 'Country';
 }
 
 function countryStyle(feature) {
   const iso3 = countryCode(feature);
   const score = iso3 ? scoreMap.get(iso3) : undefined;
+
   return {
-    color: '#ffffff',
-    weight: 0.7,
-    opacity: 0.82,
-    fillColor: score == null ? '#b8c0bd' : colorForScore(score),
-    fillOpacity: score == null ? 0.42 : 0.82,
+    color: 'rgba(205, 218, 242, 0.35)',
+    weight: 0.55,
+    opacity: 1,
+    fillColor: score == null ? '#252d3b' : colorForScore(score),
+    fillOpacity: score == null ? 0.50 : 0.80,
   };
 }
 
 function selectedStyle(feature) {
   return {
     ...countryStyle(feature),
-    color: '#142d2a',
-    weight: 2.3,
+    color: '#eef4ff',
+    weight: 1.8,
     fillOpacity: 0.95,
   };
 }
 
 function colorForScore(score) {
-  const index = Math.min(palette.length - 1, Math.max(0, Math.floor((score / 100) * palette.length)));
+  const normalized = Math.max(0, Math.min(100, Number(score) || 0));
+  const index = Math.min(palette.length - 1, Math.floor((normalized / 100) * palette.length));
   return palette[index];
 }
 
 function onHover(feature, layer) {
-  if (layer !== selectedLayer) layer.setStyle({ weight: 1.6, color: '#253c39', fillOpacity: 0.9 });
+  if (layer !== selectedLayer) {
+    layer.setStyle({ weight: 1.4, color: 'rgba(240,245,255,.85)', fillOpacity: 0.92 });
+    layer.bringToFront?.();
+  }
+
   const iso3 = countryCode(feature);
   hoverHandler({ iso3, name: countryName(feature), score: iso3 ? scoreMap.get(iso3) : null });
 }

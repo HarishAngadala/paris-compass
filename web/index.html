@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Paris Compass — an interactive climate performance dashboard comparing country-level emissions, renewable energy use, and ecological footprint." />
-  <title>Paris Compass</title>
+  <meta name="description" content="Paris Compass — an interactive climate dashboard comparing country-level emissions, renewable energy use, and ecological footprint." />
+  <meta name="theme-color" content="#070b14" />
+  <title>Paris Compass — Climate Gauge</title>
   <link rel="icon" href="/assets/compass.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
@@ -12,134 +13,227 @@
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="Paris Compass home">
-      <img src="/assets/compass.svg" alt="" width="34" height="34" />
-      <span><strong>Paris</strong> Compass</span>
-    </a>
-    <div class="topbar-actions">
-      <button id="aboutButton" class="ghost-button" type="button">About the index</button>
-      <button id="refreshButton" class="ghost-button" type="button" title="Refresh live datasets">Refresh data</button>
-      <span id="dataStatus" class="status-pill"><span class="status-dot"></span> Loading data</span>
-    </div>
-  </header>
+  <main id="app">
+    <section id="welcome" class="welcome-screen" aria-labelledby="welcomeTitle">
+      <div class="welcome-glow glow-one"></div>
+      <div class="welcome-glow glow-two"></div>
 
-  <main class="app-shell">
-    <aside class="sidebar" aria-label="Climate controls and country details">
-      <section class="sidebar-section intro-block">
-        <p class="eyebrow">GLOBAL CLIMATE DASHBOARD</p>
-        <h1>How is the world tracking?</h1>
-        <p>Compare country-level climate performance across emissions, renewable energy, and ecological footprint.</p>
-      </section>
+      <nav class="welcome-nav" aria-label="Project navigation">
+        <a class="brand" href="#" aria-label="Paris Compass home">
+          <span class="brand-mark"><img src="/assets/compass.svg" alt="" /></span>
+          <span>Paris <strong>Compass</strong></span>
+        </a>
+        <button id="heroAboutButton" class="nav-link" type="button">About the index</button>
+      </nav>
 
-      <section class="sidebar-section">
-        <label class="field-label" for="countrySearch">Find a country</label>
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" /></svg>
-          <input id="countrySearch" type="search" list="countryList" placeholder="Search by country name" autocomplete="off" />
-          <datalist id="countryList"></datalist>
-        </div>
-      </section>
+      <div class="welcome-content">
+        <div class="hero-badge"><span></span> Global Climate Performance Dashboard</div>
+        <h1 id="welcomeTitle">See where the world<br /><em>stands on climate.</em></h1>
+        <p class="hero-copy">
+          Explore environmental performance across 190+ countries through emissions,
+          renewable energy usage, and ecological footprint data.
+        </p>
 
-      <section class="sidebar-section">
-        <p class="field-label">Map metric</p>
-        <div class="metric-grid" role="tablist" aria-label="Climate metric">
-          <button class="metric-button active" data-topic="overall" type="button">
-            <span class="metric-icon">◎</span><span>Overall</span><small>Composite index</small>
-          </button>
-          <button class="metric-button" data-topic="emissions" type="button">
-            <span class="metric-icon">CO₂</span><span>Emissions</span><small>Per capita</small>
-          </button>
-          <button class="metric-button" data-topic="energy" type="button">
-            <span class="metric-icon">⚡</span><span>Energy</span><small>Renewable share</small>
-          </button>
-          <button class="metric-button" data-topic="eco_footprint" type="button">
-            <span class="metric-icon">◌</span><span>Footprint</span><small>gha / person</small>
-          </button>
-        </div>
-      </section>
-
-      <section id="countryCard" class="country-card hidden" aria-live="polite">
-        <div class="country-card-head">
-          <div>
-            <span id="countryCode" class="country-code">USA</span>
-            <h2 id="countryName">United States</h2>
-          </div>
-          <div class="score-badge"><strong id="overallScore">—</strong><span>/100</span></div>
-        </div>
-        <div class="status-line"><span id="countryStatus" class="country-status">—</span><span id="coverageText"></span></div>
-
-        <div class="metric-list">
-          <div class="metric-row">
-            <div><span>CO₂ / capita</span><small id="emissionsYear"></small></div>
-            <strong id="emissionsValue">—</strong>
-            <span id="emissionsMiniScore" class="mini-score">—</span>
-          </div>
-          <div class="metric-row">
-            <div><span>Renewable energy</span><small id="renewableYear"></small></div>
-            <strong id="renewableValue">—</strong>
-            <span id="energyMiniScore" class="mini-score">—</span>
-          </div>
-          <div class="metric-row">
-            <div><span>Ecological footprint</span><small>gha / person</small></div>
-            <strong id="footprintValue">—</strong>
-            <span id="footprintMiniScore" class="mini-score">—</span>
-          </div>
+        <div class="hero-metrics" aria-label="Paris Compass climate metrics">
+          <div><span class="metric-symbol">CO₂</span><strong>Emissions</strong><small>Per capita output</small></div>
+          <div><span class="metric-symbol">⚡</span><strong>Energy Usage</strong><small>Renewable share</small></div>
+          <div><span class="metric-symbol">◎</span><strong>Ecological Footprint</strong><small>Resource demand</small></div>
         </div>
 
-        <button id="insightButton" class="primary-button" type="button">Generate AI climate insight</button>
-        <div id="insightBox" class="insight-box hidden">
-          <div class="insight-label"><span>✦</span> Gemini analysis</div>
-          <p id="insightText"></p>
-          <small id="insightSource"></small>
-        </div>
-      </section>
-
-      <section id="emptyCard" class="empty-card">
-        <div class="empty-icon">↗</div>
-        <strong>Select a country</strong>
-        <p>Click anywhere on the map to view climate metrics and an AI-generated summary.</p>
-      </section>
-    </aside>
-
-    <section class="map-panel" aria-label="Interactive global climate map">
-      <div id="map"></div>
-      <div class="map-overlay map-title-card">
-        <span id="mapMetricLabel">Climate Compliance Index</span>
-        <strong id="mapMetricSubtitle">Higher score = stronger relative performance</strong>
+        <button id="startBtn" class="start-button" type="button">
+          <span>Open Climate Gauge</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+        <p class="hero-footnote">Interactive country map · Climate Compliance Index · AI-powered insights</p>
       </div>
-      <div class="map-overlay legend-card" aria-label="Map legend">
-        <span>Lower</span>
-        <div class="legend-gradient"></div>
-        <span>Higher</span>
-        <small>Gray = no score</small>
-      </div>
-      <div id="mapLoading" class="map-loading"><div class="spinner"></div><span>Loading country boundaries…</span></div>
     </section>
 
-    <aside class="ranking-panel" aria-label="Country ranking">
-      <div class="ranking-head">
-        <div><p class="eyebrow">LEADERBOARD</p><h2 id="rankingTitle">Overall index</h2></div>
-        <span id="rankCount">—</span>
+    <section id="dashboard" class="dashboard hidden" aria-label="Paris Compass Climate Gauge">
+      <header class="dashboard-header">
+        <a class="brand dashboard-brand" href="#" aria-label="Paris Compass">
+          <span class="brand-mark"><img src="/assets/compass.svg" alt="" /></span>
+          <span>Paris <strong>Compass</strong></span>
+        </a>
+
+        <div class="dashboard-heading">
+          <span class="header-kicker">INTERACTIVE DASHBOARD</span>
+          <strong>Climate Gauge</strong>
+        </div>
+
+        <div class="header-actions">
+          <button id="aboutButton" class="header-button" type="button">Methodology</button>
+          <button id="refreshButton" class="header-button" type="button">Refresh data</button>
+          <span id="dataStatus" class="status-pill loading"><span class="status-dot"></span>Loading data</span>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+        <section class="gauge-card">
+          <div class="control-row">
+            <div class="topic-tabs" role="tablist" aria-label="Climate metric">
+              <button class="metric-button active" data-topic="overall" role="tab" type="button">
+                <span class="tab-icon">◇</span><span>Overall Index</span>
+              </button>
+              <button class="metric-button" data-topic="emissions" role="tab" type="button">
+                <span class="tab-icon">CO₂</span><span>Emissions</span>
+              </button>
+              <button class="metric-button" data-topic="energy" role="tab" type="button">
+                <span class="tab-icon">⚡</span><span>Energy Usage</span>
+              </button>
+              <button class="metric-button" data-topic="eco_footprint" role="tab" type="button">
+                <span class="tab-icon">◎</span><span>Ecological Footprint</span>
+              </button>
+            </div>
+
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" /></svg>
+              <input id="countrySearch" type="search" list="countryList" placeholder="Search a country…" autocomplete="off" />
+              <datalist id="countryList"></datalist>
+            </div>
+          </div>
+
+          <div class="main-grid">
+            <section class="map-column" aria-label="Interactive global climate map">
+              <div class="map-frame">
+                <div id="map"></div>
+
+                <div class="map-overlay map-heading-card">
+                  <span class="overlay-kicker">CURRENT VIEW</span>
+                  <strong id="mapMetricLabel">Climate Compliance Index</strong>
+                  <small id="mapMetricSubtitle">Higher score = stronger relative performance</small>
+                </div>
+
+                <div class="map-overlay legend-card" aria-label="Map legend">
+                  <div class="legend-labels"><span>0 · Lower</span><span>100 · Higher</span></div>
+                  <div class="legend-gradient"></div>
+                  <small>Red = weaker relative performance · Blue = stronger relative performance</small>
+                </div>
+
+                <div id="mapLoading" class="map-loading">
+                  <div class="spinner"></div>
+                  <strong>Loading the world map</strong>
+                  <span>Matching country boundaries with climate data…</span>
+                </div>
+              </div>
+
+              <div class="map-meta-row">
+                <div class="data-badge"><span class="badge-dot"></span><span>Updated</span><strong id="lastUpdatedBadge">—</strong></div>
+                <div class="data-badge"><span>Coverage</span><strong id="countryCountBadge">—</strong></div>
+                <div class="data-badge"><span>Scale</span><strong>0–100 percentile</strong></div>
+                <div class="map-hint"><span>↗</span> Click any country for a detailed breakdown</div>
+              </div>
+            </section>
+
+            <aside class="country-panel" aria-label="Selected country details">
+              <section id="emptyCard" class="empty-state">
+                <div class="empty-orbit"><span>+</span></div>
+                <p class="panel-kicker">COUNTRY INSPECTOR</p>
+                <h2>Select a country</h2>
+                <p>Click a country on the map, use search, or choose one from the leaderboard to inspect its climate performance.</p>
+                <div class="empty-preview">
+                  <span></span><span></span><span></span>
+                </div>
+              </section>
+
+              <section id="countryCard" class="country-detail hidden" aria-live="polite">
+                <div class="country-topline">
+                  <div>
+                    <span id="countryCode" class="country-code">USA</span>
+                    <h2 id="countryName">United States</h2>
+                  </div>
+                  <div id="scoreRing" class="score-ring" style="--score:0">
+                    <div><strong id="overallScore">—</strong><span>/100</span></div>
+                  </div>
+                </div>
+
+                <div class="status-row">
+                  <span id="countryStatus" class="country-status">—</span>
+                  <span id="coverageText" class="coverage-text"></span>
+                </div>
+
+                <div class="metric-stack">
+                  <article class="metric-card">
+                    <div class="metric-card-icon">CO₂</div>
+                    <div class="metric-card-copy">
+                      <span>CO₂ emissions per capita</span>
+                      <small id="emissionsYear">—</small>
+                    </div>
+                    <div class="metric-card-value"><strong id="emissionsValue">—</strong><span id="emissionsMiniScore">—</span></div>
+                  </article>
+
+                  <article class="metric-card">
+                    <div class="metric-card-icon">⚡</div>
+                    <div class="metric-card-copy">
+                      <span>Renewable energy</span>
+                      <small id="renewableYear">—</small>
+                    </div>
+                    <div class="metric-card-value"><strong id="renewableValue">—</strong><span id="energyMiniScore">—</span></div>
+                  </article>
+
+                  <article class="metric-card">
+                    <div class="metric-card-icon">◎</div>
+                    <div class="metric-card-copy">
+                      <span>Ecological footprint</span>
+                      <small>Global hectares / person</small>
+                    </div>
+                    <div class="metric-card-value"><strong id="footprintValue">—</strong><span id="footprintMiniScore">—</span></div>
+                  </article>
+                </div>
+
+                <button id="insightButton" class="insight-button" type="button">
+                  <span class="sparkle">✦</span>
+                  <span>Generate Gemini climate insight</span>
+                  <span class="button-arrow">→</span>
+                </button>
+
+                <div id="insightBox" class="insight-box hidden">
+                  <div class="insight-label"><span>✦</span> AI CLIMATE ANALYSIS</div>
+                  <p id="insightText"></p>
+                  <small id="insightSource"></small>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section class="leaderboard-card" aria-label="Country leaderboard">
+          <div class="leaderboard-heading">
+            <div>
+              <p class="panel-kicker">GLOBAL LEADERBOARD</p>
+              <h2 id="rankingTitle">Overall index</h2>
+            </div>
+            <div class="leaderboard-meta">
+              <span id="rankCount">—</span>
+              <small>Click a country to inspect</small>
+            </div>
+          </div>
+          <div id="rankingList" class="ranking-grid"></div>
+          <p class="ranking-note">Scores are project-defined percentile comparisons, not official Paris Agreement compliance determinations.</p>
+        </section>
       </div>
-      <div id="rankingList" class="ranking-list"></div>
-      <p class="ranking-note">Scores are percentile-based comparisons, not official Paris Agreement compliance determinations.</p>
-    </aside>
+    </section>
   </main>
 
   <dialog id="aboutDialog">
     <form method="dialog" class="dialog-card">
       <div class="dialog-head">
-        <div><p class="eyebrow">METHODOLOGY</p><h2>Climate Compliance Index</h2></div>
+        <div>
+          <p class="panel-kicker">METHODOLOGY</p>
+          <h2>Climate Compliance Index</h2>
+        </div>
         <button class="dialog-close" aria-label="Close" value="cancel">×</button>
       </div>
-      <p>Paris Compass normalizes three environmental indicators into 0–100 percentile scores. Higher scores represent stronger relative performance among countries with available data.</p>
+
+      <p class="dialog-intro">Paris Compass normalizes three environmental indicators into 0–100 percentile scores. Higher scores represent stronger relative performance among countries with available data.</p>
+
       <div class="formula-grid">
-        <div><strong>40%</strong><span>CO₂ emissions per capita</span><small>Lower is better</small></div>
-        <div><strong>30%</strong><span>Renewable energy share</span><small>Higher is better</small></div>
-        <div><strong>30%</strong><span>Ecological footprint</span><small>Lower is better</small></div>
+        <div><span class="formula-number">01</span><strong>40%</strong><p>CO₂ emissions per capita</p><small>Lower is better</small></div>
+        <div><span class="formula-number">02</span><strong>30%</strong><p>Renewable energy share</p><small>Higher is better</small></div>
+        <div><span class="formula-number">03</span><strong>30%</strong><p>Ecological footprint</p><small>Lower is better</small></div>
       </div>
-      <p class="dialog-disclaimer">The index is a project-defined comparative indicator. It is not an official UN or Paris Agreement rating and should not be used as a policy compliance determination.</p>
+
+      <div class="formula-equation"><span>Overall score</span><strong>= 0.40(E) + 0.30(R) + 0.30(F)</strong></div>
+      <p class="dialog-disclaimer">The Climate Compliance Index is a project-defined comparative indicator. It is not an official UN or Paris Agreement rating and should not be interpreted as a legal or policy compliance determination.</p>
       <div id="sourceList" class="source-list"></div>
     </form>
   </dialog>
