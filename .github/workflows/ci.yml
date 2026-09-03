@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
   pull_request:
@@ -6,21 +7,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
       - name: Compile Java backend
         run: |
           mkdir -p build/classes
           find src/main/java -name '*.java' -print0 | xargs -0 javac --release 21 -encoding UTF-8 -d build/classes
+
       - name: Check frontend JavaScript syntax
         run: |
-          node --check web/js/api.js
-          node --check web/js/map.js
-          node --check web/js/app.js
+          node --check web/app.js
